@@ -70,7 +70,7 @@ func getName(conn net.Conn, addr, hash string) {
 			for k, v := range sp {
 				if strings.Contains(v, "name") {
 					vr := sp[k+1]
-					fmt.Println(hash, vr[:len(vr)-2])
+					fmt.Println("magnet:?xt=urn:btih:"+hash, vr[:len(vr)-2])
 				}
 			}
 		}
@@ -100,10 +100,12 @@ func getPeers(addr, hash string) {
 		if len(per.R.Values) > 0 {
 			for _, v := range per.R.Values {
 				el := []byte(v)
-				ip := el[:4]
-				port := getPort(el[4:])
-				addr := fmt.Sprintf("%v.%v.%v.%v:%v", ip[0], ip[1], ip[2], ip[3], port)
-				handShake(addr, hash)
+				if len(el) == 6 {
+					ip := el[:4]
+					port := getPort(el[4:])
+					addr := fmt.Sprintf("%v.%v.%v.%v:%v", ip[0], ip[1], ip[2], ip[3], port)
+					handShake(addr, hash)
+				}
 			}
 		}
 	}
