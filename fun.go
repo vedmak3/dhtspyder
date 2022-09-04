@@ -58,9 +58,8 @@ func getHash(id []byte, addr string, rec int) {
 		if h.R.Num > 0 {
 			b := []byte(h.R.Samples)
 			for i := 0; i < len(b)/20; i++ {
-				fmt.Println("-", i)
 				hash := hashToText(b[i*20 : (i+1)*20])
-				getPeers(addr, hash)
+				go getPeers(addr, hash)
 			}
 		}
 	}

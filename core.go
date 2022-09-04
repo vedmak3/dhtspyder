@@ -15,15 +15,11 @@ import (
 var Id = "abcdefghij0123456789"
 
 func main() {
-	i := 0
 	for {
-		fmt.Println("*", i)
 		n := findNode()
-		for k, v := range n {
+		for _, v := range n {
 			getHash(v.id, v.ip, 0)
-			fmt.Println(k)
 		}
-		i++
 	}
 }
 
