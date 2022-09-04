@@ -49,15 +49,16 @@ func getHash(id []byte, addr string, rec int) {
 		bufio.NewReader(conn).Read(buf)
 		var h hashSamples
 		bencode.Unmarshal(bytes.NewReader(buf), &h)
-		if rec <= 1 {
+		/*if rec <= 1 {
 			ns := getNodes(h.R.Nodes)
 			for _, v := range ns {
 				getHash(v.id, v.ip, rec+1)
 			}
-		}
+		}*/
 		if h.R.Num > 0 {
 			b := []byte(h.R.Samples)
 			for i := 0; i < len(b)/20; i++ {
+				fmt.Println("-", i)
 				hash := hashToText(b[i*20 : (i+1)*20])
 				getPeers(addr, hash)
 			}
