@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 	"time"
 
 	bencode "github.com/jackpal/bencode-go"
@@ -82,4 +83,24 @@ func getNodes(nods string) []Noda {
 		ns = append(ns, Noda{id: id, ip: addr})
 	}
 	return ns
+}
+
+func getTime() string {
+	t := time.Now()
+	hh := t.Hour()
+	mm := t.Minute()
+	return fmt.Sprintf("%v:%v", hh, mm)
+}
+
+func getLength(sp []string) string {
+	var sum = 0
+	for _, v := range sp {
+		if strings.Contains(v, "lengthi") {
+			a := strings.Index(v[7:], "e")
+			vr, _ := strconv.Atoi(v[7 : a+7])
+			sum += vr
+		}
+	}
+	zn := float32(sum) / 1073741824
+	return fmt.Sprintf("%.2fГб", zn)
 }
