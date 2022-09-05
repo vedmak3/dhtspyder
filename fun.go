@@ -59,7 +59,11 @@ func getHash(id []byte, addr string, rec int) {
 			b := []byte(h.R.Samples)
 			for i := 0; i < len(b)/20; i++ {
 				hash := hashToText(b[i*20 : (i+1)*20])
-				go getPeers(addr, hash)
+				_, fl := SpHash[hash]
+				if !fl {
+					go getPeers(addr, hash)
+				}
+
 			}
 		}
 	}

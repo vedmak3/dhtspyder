@@ -1,6 +1,6 @@
 package main
 
-type FindNodes struct {
+type findNodes struct {
 	Y string `bencode:"y"`
 	T string `bencode:"t"`
 	Q string `bencode:"q"`
@@ -15,19 +15,6 @@ type Noda struct {
 	id []byte
 	ip string
 }
-
-/*{
-    "r":
-    {
-        "id": <20 byte id of sending node (string)>,
-        "interval": <the subset refresh interval in seconds (integer)>,
-        "nodes": <nodes close to 'target'>,
-        "num": <number of infohashes in storage (integer)>,
-        "samples": <subset of stored infohashes, N × 20 bytes (string)>
-    },
-    "t": <transaction-id (string)>,
-    "y": "r"
-}*/
 
 type hashSamples struct {
 	Y string `bencode:"y"`

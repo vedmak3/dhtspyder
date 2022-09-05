@@ -13,26 +13,31 @@ import (
 )
 
 var Id = "abcdefghij0123456789"
+var spisok = [3]string{"router.bittorrent.com:6881", "router.utorrent.com:6881", "dht.transmissionbt.com:6881"}
+var SpHash = make(map[string]bool)
 
 func main() {
 	for {
-		n := findNode()
-		for _, v := range n {
-			getHash(v.id, v.ip, 0)
+		for _, v := range spisok {
+			n := findNode(v)
+			for _, v := range n {
+				getHash(v.id, v.ip, 0)
+			}
 		}
+
 	}
 }
 
-func findNode() []Noda {
+func findNode(server string) []Noda {
 	buf := make([]byte, 600)
-	conn, _ := net.Dial("udp4", "router.bittorrent.com:6881")
+	conn, _ := net.Dial("udp4", server)
 	defer conn.Close()
 	if conn != nil {
 		conn.SetDeadline(time.Now().Add(5 * time.Second))
 		conn.Write([]byte(fmt.Sprintf("d1:ad2:id20:%s6:target20:%se1:q9:find_node1:t2:aa1:y1:qe", Id, Id)))
 		bufio.NewReader(conn).Read(buf)
 		conn.Close()
-		var n FindNodes
+		var n findNodes
 		bencode.Unmarshal(bytes.NewReader(buf), &n)
 		return getNodes(n.R.Nodes)
 	}
@@ -69,6 +74,7 @@ func getName(conn net.Conn, addr, hash string) {
 			sp := strings.Split(otv, ":")
 			for k, v := range sp {
 				if strings.Contains(v, "name") {
+					SpHash[hash] = true
 					vr := sp[k+1]
 					fmt.Println("magnet:?xt=urn:btih:"+hash, vr[:len(vr)-2])
 				}
