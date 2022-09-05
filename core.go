@@ -14,8 +14,6 @@ import (
 
 var Id string = "abcdefghij0123456789"
 
-//var Id string = "00000000000000000001"
-
 // var Id string
 var spisok = []string{"router.bittorrent.com:6881", "router.utorrent.com:6881", "dht.transmissionbt.com:6881", "dht.libtorrent.org:25401"}
 var SpHash = make(map[string]bool)
@@ -23,8 +21,6 @@ var SpHash = make(map[string]bool)
 func main() {
 	for {
 		for _, v := range spisok {
-			//Id = randId()
-			//fmt.Println("!!!!", v, Id, len(Id))
 			n := findNode(v)
 			for _, v := range n {
 				getHash(v.id, v.ip, 0)

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"math/rand"
 	"net"
 	"strconv"
 	"strings"
@@ -94,30 +93,14 @@ func getTime() string {
 }
 
 func getLength(sp []string) string {
-	var sum = 0
+	var sum uint64
 	for _, v := range sp {
 		if strings.Contains(v, "lengthi") {
 			a := strings.Index(v[7:], "e")
-			vr, _ := strconv.Atoi(v[7 : a+7])
+			vr, _ := strconv.ParseUint(v[7:a+7], 10, 64)
 			sum += vr
 		}
 	}
-	zn := float32(sum) / 1073741824
+	zn := float64(sum) / 1073741824
 	return fmt.Sprintf("%.2fГб", zn)
-}
-
-func randId() string {
-	rand.Seed(time.Now().UnixNano())
-	var b string
-	for {
-		b += string(rand.Intn(255))
-		if len(b) == 20 {
-			break
-		}
-		if len(b) > 20 {
-			b = b[:20]
-			break
-		}
-	}
-	return b
 }
