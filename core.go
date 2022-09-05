@@ -19,7 +19,7 @@ var SpHash = make(map[string]bool)
 func main() {
 	for {
 		for _, v := range spisok {
-			fmt.Println("!!!!")
+			fmt.Println("!!!!", v)
 			n := findNode(v)
 			for _, v := range n {
 				getHash(v.id, v.ip, 0)
@@ -32,7 +32,6 @@ func main() {
 func findNode(server string) []Noda {
 	buf := make([]byte, 600)
 	conn, _ := net.Dial("udp4", server)
-	defer conn.Close()
 	if conn != nil {
 		conn.SetDeadline(time.Now().Add(5 * time.Second))
 		conn.Write([]byte(fmt.Sprintf("d1:ad2:id20:%s6:target20:%se1:q9:find_node1:t2:aa1:y1:qe", Id, Id)))
