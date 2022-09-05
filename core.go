@@ -77,7 +77,11 @@ func getName(conn net.Conn, addr, hash string) bool {
 				if strings.Contains(v, "name") {
 					SpHash[hash] = true
 					vr := sp[k+1]
-					fmt.Println("magnet:?xt=urn:btih:"+hash, vr[:len(vr)-2])
+					t := time.Now()
+					hh := t.Hour()
+					mm := t.Minute()
+					tS := fmt.Sprintf("%v:%v", hh, mm)
+					fmt.Println(tS, "magnet:?xt=urn:btih:"+hash, vr[:len(vr)-2])
 					return true
 				}
 			}
