@@ -12,14 +12,16 @@ import (
 	bencode "github.com/jackpal/bencode-go"
 )
 
-var Id string = "abcdefghij0123456789"
+// var Id string = "abcdefghij0123456789"
+var Id string
 var spisok = []string{"router.bittorrent.com:6881", "router.utorrent.com:6881", "dht.transmissionbt.com:6881", "router.bitcomet.com:6881", "dht.aelitis.com:6881", "dht.libtorrent.org:25401"}
 var SpHash = make(map[string]bool)
 
 func main() {
 	for {
 		for _, v := range spisok {
-			fmt.Println("!!!!", v)
+			Id = randId()
+			fmt.Println("!!!!", v, Id, len(Id))
 			n := findNode(v)
 			for _, v := range n {
 				getHash(v.id, v.ip, 0)

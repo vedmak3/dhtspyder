@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"math/rand"
 	"net"
 	"strconv"
 	"strings"
@@ -103,4 +104,15 @@ func getLength(sp []string) string {
 	}
 	zn := float32(sum) / 1073741824
 	return fmt.Sprintf("%.2fГб", zn)
+}
+
+func randId() string {
+	var b string
+	for {
+		b += string(rand.Intn(255))
+		if len(b) == 20 {
+			break
+		}
+	}
+	return b
 }
