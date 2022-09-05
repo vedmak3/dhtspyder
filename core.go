@@ -44,7 +44,7 @@ func findNode(server string) []Noda {
 	return []Noda{}
 }
 
-func handShake(addr, hash string) {
+func handShake(addr, hash string) bool {
 	q1 := make([]byte, 20)
 	hex.Decode(q1, []byte(hash))
 	q2 := make([]byte, 20)
@@ -59,12 +59,13 @@ func handShake(addr, hash string) {
 		p := make([]byte, 400)
 		n, _ := bufio.NewReader(conn).Read(p)
 		if n != 0 {
-			getName(conn, addr, hash)
+			return getName(conn, addr, hash)
 		}
 	}
+	return false
 }
 
-func getName(conn net.Conn, addr, hash string) {
+func getName(conn net.Conn, addr, hash string) bool {
 	conn.Write([]byte("\x00\x00\x00\x1a\x14\x00d1:md11:ut_metadatai2eee\x00\x00\x00\x1b\x14\x02\x64\x38\x3a\x6d\x73\x67\x5f\x74\x79\x70\x65\x69\x30\x65\x35\x3a\x70\x69\x65\x63\x65\x69\x30\x65\x65"))
 	p := make([]byte, 2000)
 	n, _ := bufio.NewReader(conn).Read(p)
@@ -77,11 +78,13 @@ func getName(conn net.Conn, addr, hash string) {
 					SpHash[hash] = true
 					vr := sp[k+1]
 					fmt.Println("magnet:?xt=urn:btih:"+hash, vr[:len(vr)-2])
+					return true
 				}
 			}
 		}
 	}
 	conn.Close()
+	return false
 }
 
 func getPeers(addr, hash string) {
@@ -110,7 +113,9 @@ func getPeers(addr, hash string) {
 					ip := el[:4]
 					port := getPort(el[4:])
 					addr := fmt.Sprintf("%v.%v.%v.%v:%v", ip[0], ip[1], ip[2], ip[3], port)
-					handShake(addr, hash)
+					if handShake(addr, hash) {
+						break
+					}
 				}
 			}
 		}
