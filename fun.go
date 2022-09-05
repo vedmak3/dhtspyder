@@ -107,10 +107,15 @@ func getLength(sp []string) string {
 }
 
 func randId() string {
+	rand.Seed(time.Now().UnixNano())
 	var b string
 	for {
 		b += string(rand.Intn(255))
 		if len(b) == 20 {
+			break
+		}
+		if len(b) > 20 {
+			b = b[:20]
 			break
 		}
 	}
