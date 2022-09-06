@@ -97,8 +97,11 @@ func getLength(sp []string) string {
 	for _, v := range sp {
 		if strings.Contains(v, "lengthi") {
 			a := strings.Index(v[7:], "e")
-			vr, _ := strconv.ParseUint(v[7:a+7], 10, 64)
-			sum += vr
+			if a+7 < len(v) {
+				vr, _ := strconv.ParseUint(v[7:a+7], 10, 64)
+				sum += vr
+			}
+
 		}
 	}
 	zn := float64(sum) / 1073741824
