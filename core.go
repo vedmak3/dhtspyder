@@ -67,18 +67,27 @@ func handShake(addr, hash string) bool {
 }
 
 func getName(conn net.Conn, addr, hash string) bool {
+	oS := ""
 	conn.Write([]byte("\x00\x00\x00\x1a\x14\x00d1:md11:ut_metadatai2eee\x00\x00\x00\x1b\x14\x02\x64\x38\x3a\x6d\x73\x67\x5f\x74\x79\x70\x65\x69\x30\x65\x35\x3a\x70\x69\x65\x63\x65\x69\x30\x65\x65"))
 	p := make([]byte, 2000)
 	n, _ := bufio.NewReader(conn).Read(p)
 	if n != 0 {
-		otv := string(p)
-		if strings.Index(otv, "msg_typei1e5") != -1 {
-			sp := strings.Split(otv, ":")
+		otv := string(p[:n])
+		oS += otv
+		for {
+			n, _ = bufio.NewReader(conn).Read(p)
+			if n != 0 {
+				otv = string(p[:n])
+				oS += otv
+			} else {
+				break
+			}
+		}
+
+		if strings.Index(oS, "msg_typei1e5") != -1 {
+			sp := strings.Split(oS, ":")
 			for k, v := range sp {
 				if strings.Contains(v, "name") {
-					//for _, v := range sp {
-					//	fmt.Println(v)
-					//}
 					if k+1 < len(sp) {
 						vr := sp[k+1]
 						l := getLength(sp)

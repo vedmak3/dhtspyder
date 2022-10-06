@@ -1,4 +1,2 @@
-github.com/cristalhq/bencode v0.2.1 h1:8/NJ0d7SUn3RmdSOpnLPDpARCeeN6ekMR7frUsiHf1M=
-github.com/cristalhq/bencode v0.2.1/go.mod h1:jeU9UXyYxND864Vhrommq0Aif3sGpf9HUkGK1PPh54w=
 github.com/jackpal/bencode-go v1.0.0 h1:lzbSPPqqSfWQnqVNe/BBY1NXdDpncArxShL10+fmFus=
 github.com/jackpal/bencode-go v1.0.0/go.mod h1:5FSBQ74yhCl5oQ+QxRPYzWMONFnxbL68/23eezsBI5c=

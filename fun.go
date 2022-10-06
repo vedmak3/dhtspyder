@@ -29,14 +29,6 @@ func getPort(i []uint8) int {
 	return int(zn)
 }
 
-func recurs(n int) string {
-	st := ""
-	for i := 0; i < n; i++ {
-		st += "+"
-	}
-	return st
-}
-
 func getHash(id []byte, addr string, rec int) {
 	conn, _ := net.Dial("udp4", addr)
 	defer conn.Close()
@@ -50,12 +42,6 @@ func getHash(id []byte, addr string, rec int) {
 		bufio.NewReader(conn).Read(buf)
 		var h hashSamples
 		bencode.Unmarshal(bytes.NewReader(buf), &h)
-		/*if rec <= 1 {
-			ns := getNodes(h.R.Nodes)
-			for _, v := range ns {
-				getHash(v.id, v.ip, rec+1)
-			}
-		}*/
 		if h.R.Num > 0 {
 			b := []byte(h.R.Samples)
 			for i := 0; i < len(b)/20; i++ {
@@ -105,5 +91,5 @@ func getLength(sp []string) string {
 		}
 	}
 	zn := float64(sum) / 1073741824
-	return fmt.Sprintf("%.2fГб", zn)
+	return fmt.Sprintf("%.2f", zn)
 }
