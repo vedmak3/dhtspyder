@@ -6,7 +6,9 @@
     <body>
         <div id="example-table"></div>
         <script>
-            let socket = new WebSocket("ws://127.0.0.1:80/ws");
+            let a=window.location.href
+            let fr=a.split('//')
+            let socket = new WebSocket("ws://"+fr[1]+"ws");
             socket.onopen = function(e) {
                  alert("[open] Соединение установлено");
             };
@@ -29,7 +31,7 @@
     ],
 });
             
-            fetch('http://127.0.0.1/data.json')
+            fetch('./data.json')
                 .then(res => res.json())
                 .then(rez => {
                     table.setData(rez);
