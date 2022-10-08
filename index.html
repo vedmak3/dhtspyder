@@ -6,6 +6,15 @@
     <body>
         <div id="example-table"></div>
         <script>
+            let socket = new WebSocket("ws://127.0.0.1:80/ws");
+            socket.onopen = function(e) {
+                 alert("[open] Соединение установлено");
+            };
+            socket.onmessage = function(event) {
+                let vr=JSON.parse(event.data)
+                table.addData(vr)
+            };
+
  var table = new Tabulator("#example-table", {
     layout:"fitData",
     columns:[

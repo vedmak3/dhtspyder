@@ -8,14 +8,24 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/gorilla/websocket"
 	bencode "github.com/jackpal/bencode-go"
 )
+
+var wsConn *websocket.Conn
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin:     func(r *http.Request) bool { return true },
+}
 
 //go:embed index.html
 var f embed.FS
@@ -28,11 +38,38 @@ var SpHash = []TorrAttr{}
 var SpMeta = make(map[string]string)
 var mut = &sync.RWMutex{}
 
+func reader(conn *websocket.Conn) {
+	for {
+		// read in a message
+		messageType, p, err := conn.ReadMessage()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		// print out that message for clarity
+		log.Println(string(p))
+
+		if err := conn.WriteMessage(messageType, p); err != nil {
+			log.Println(err)
+			return
+		}
+
+	}
+}
+
+func wsEndpoint(w http.ResponseWriter, r *http.Request) {
+	// upgrade this connection to a WebSocket
+	// connection
+	wsConn, _ = upgrader.Upgrade(w, r, nil)
+	log.Println("Client Connected")
+}
+
 func main() {
 
 	go mainCicle()
 	mux := http.NewServeMux()
 
+	mux.HandleFunc("/ws", wsEndpoint)
 	mux.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(f))))
 	mux.HandleFunc("/data.json", dataPage)
 
@@ -124,6 +161,10 @@ func getName(conn net.Conn, addr, hash string) bool {
 						tS := getTime()
 						name := vr[:len(vr)-2]
 						//	fmt.Println(tS + "\t" + "magnet:?xt=urn:btih:" + hash + "\t" + l + "\t" + name)
+						if wsConn != nil {
+							buf, _ := json.Marshal(TorrAttr{Hash: hash, Time: tS, Weight: l, Name: name})
+							wsConn.WriteMessage(1, buf)
+						}
 						mut.Lock()
 						SpHash = append(SpHash, TorrAttr{Hash: hash, Time: tS, Weight: l, Name: name})
 						SpMeta[hash] = oS
