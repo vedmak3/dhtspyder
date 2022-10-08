@@ -3,22 +3,44 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"embed"
+	_ "embed"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	bencode "github.com/jackpal/bencode-go"
 )
 
+//go:embed index.html
+var f embed.FS
+
 var Id string = "abcdefghij0123456789"
 
 // var Id string
 var spisok = []string{"router.bittorrent.com:6881", "router.utorrent.com:6881", "dht.transmissionbt.com:6881", "dht.libtorrent.org:25401"}
-var SpHash = make(map[string]bool)
+var SpHash = []TorrAttr{}
+var SpMeta = make(map[string]string)
+var mut = &sync.RWMutex{}
 
 func main() {
+
+	go mainCicle()
+	mux := http.NewServeMux()
+
+	mux.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(f))))
+	mux.HandleFunc("/data.json", dataPage)
+
+	http.ListenAndServe(":80", mux)
+
+}
+
+func mainCicle() {
 	for {
 		for _, v := range spisok {
 			n := findNode(v)
@@ -28,6 +50,14 @@ func main() {
 		}
 
 	}
+}
+
+func dataPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Access-Control-Allow-Methods", "*")
+	buf, _ := json.Marshal(SpHash)
+	fmt.Fprint(w, string(buf))
 }
 
 func findNode(server string) []Noda {
@@ -92,8 +122,12 @@ func getName(conn net.Conn, addr, hash string) bool {
 						vr := sp[k+1]
 						l := getLength(sp)
 						tS := getTime()
-						fmt.Println(tS + "\t" + "magnet:?xt=urn:btih:" + hash + "\t" + l + "\t" + vr[:len(vr)-2])
-						SpHash[hash] = true
+						name := vr[:len(vr)-2]
+						//	fmt.Println(tS + "\t" + "magnet:?xt=urn:btih:" + hash + "\t" + l + "\t" + name)
+						mut.Lock()
+						SpHash = append(SpHash, TorrAttr{Hash: hash, Time: tS, Weight: l, Name: name})
+						SpMeta[hash] = oS
+						mut.Unlock()
 						return true
 					}
 					return false

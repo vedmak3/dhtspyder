@@ -46,7 +46,9 @@ func getHash(id []byte, addr string, rec int) {
 			b := []byte(h.R.Samples)
 			for i := 0; i < len(b)/20; i++ {
 				hash := hashToText(b[i*20 : (i+1)*20])
-				_, fl := SpHash[hash]
+				mut.RLock()
+				_, fl := SpMeta[hash]
+				mut.RUnlock()
 				if !fl {
 					go getPeers(addr, hash)
 				}
@@ -83,11 +85,12 @@ func getLength(sp []string) string {
 	for _, v := range sp {
 		if strings.Contains(v, "lengthi") {
 			a := strings.Index(v[7:], "e")
-			if a+7 < len(v) {
-				vr, _ := strconv.ParseUint(v[7:a+7], 10, 64)
-				sum += vr
+			if a > 0 {
+				if a+7 < len(v) {
+					vr, _ := strconv.ParseUint(v[7:a+7], 10, 64)
+					sum += vr
+				}
 			}
-
 		}
 	}
 	zn := float64(sum) / 1073741824

@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <link href="https://unpkg.com/tabulator-tables@5.4.0/dist/css/tabulator.css" rel="stylesheet">
+        <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.4.0/dist/js/tabulator.js"></script>
+    </head>
+    <body>
+        <div id="example-table"></div>
+        <script>
+ var table = new Tabulator("#example-table", {
+    layout:"fitData",
+    columns:[
+    {title:"Magnet", field:"Hash",formatter:"link", formatterParams:{
+    labelField:"Hash",
+    urlPrefix:"magnet:?xt=urn:btih:",
+    target:"_blank",
+}},
+    {title:"время", field:"Time"},
+    {title:"вес", field:"Weight"},
+    {title:"название", field:"Name"},
+    ],
+});
+            
+            fetch('http://127.0.0.1/data.json')
+                .then(res => res.json())
+                .then(rez => {
+                    table.setData(rez);
+                });
+    
+        </script>
+    </body>
+</html>
+
+

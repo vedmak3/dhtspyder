@@ -42,3 +42,10 @@ type getPeer struct {
 	} `bencode:"r"`
 	Ip string `bencode:"ip"`
 }
+
+type TorrAttr struct {
+	Hash   string
+	Time   string
+	Weight string
+	Name   string
+}
