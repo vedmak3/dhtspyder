@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"embed"
-	_ "embed"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net"
 	"net/http"
@@ -19,6 +19,9 @@ import (
 	bencode "github.com/jackpal/bencode-go"
 )
 
+//go:embed index.html
+var f embed.FS
+
 var wsConn *websocket.Conn
 
 var upgrader = websocket.Upgrader{
@@ -26,9 +29,6 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
-
-//go:embed index.html
-var f embed.FS
 
 var Id string = "abcdefghij0123456789"
 
@@ -70,7 +70,12 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/ws", wsEndpoint)
-	mux.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(f))))
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		tmpl, _ := template.ParseFS(f, "index.html")
+		//	tmpl, _ := template.ParseFiles("index.html")
+		tmpl.Execute(w, SpHash)
+	})
+
 	mux.HandleFunc("/data.json", dataPage)
 
 	http.ListenAndServe(":80", mux)

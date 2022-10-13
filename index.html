@@ -1,41 +1,34 @@
 <html>
-    <head>
-        <link href="https://unpkg.com/tabulator-tables@5.4.0/dist/css/tabulator.css" rel="stylesheet">
-        <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.4.0/dist/js/tabulator.js"></script>
-    </head>
     <body>
-        <div id="example-table"></div>
+        <table border="1" id="table">    
+          <tr>
+            <td>Magnet</td><td>Время</td><td>Вес, Гб</td><td>Название раздачи</td>
+          </tr>
+           {{range .}}
+          <tr><td><a href="magnet:?xt=urn:btih:{{.Hash}}">{{.Hash}}</a></td><td>{{.Time}}</td><td>{{.Weight}}</td><td>{{.Name}}</td></tr>
+      {{end}}
+        </table>
         <script>
+            let t=document.getElementById('table')
+            let obj=[]
             let a=window.location.href
             let fr=a.split('//')
             let socket = new WebSocket("ws://"+fr[1]+"ws");
             socket.onopen = function(e) {
-                 alert("[open] Соединение установлено");
+                // alert("[open] Соединение установлено");
             };
             socket.onmessage = function(event) {
                 let vr=JSON.parse(event.data)
-                table.addData(vr)
-            };
-
- var table = new Tabulator("#example-table", {
-    layout:"fitData",
-    columns:[
-    {title:"Magnet", field:"Hash",formatter:"link", formatterParams:{
-    labelField:"Hash",
-    urlPrefix:"magnet:?xt=urn:btih:",
-    target:"_blank",
-}},
-    {title:"время", field:"Time"},
-    {title:"вес", field:"Weight"},
-    {title:"название", field:"Name"},
-    ],
-});
-            
-            fetch('./data.json')
-                .then(res => res.json())
-                .then(rez => {
-                    table.setData(rez);
-                });
+                let row=t.insertRow(-1)
+                row.insertCell(0).appendChild(document.createTextNode(vr.Name))
+                row.insertCell(0).appendChild(document.createTextNode(vr.Weight))
+                row.insertCell(0).appendChild(document.createTextNode(vr.Time))
+                var createA = document.createElement('a');
+                var createAText = document.createTextNode(vr.Hash);
+                createA.setAttribute('href', "magnet:?xt=urn:btih:"+vr.Hash);
+                createA.appendChild(createAText);
+                row.insertCell(0).appendChild(createA)
+            };           
     
         </script>
     </body>
