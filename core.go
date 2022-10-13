@@ -176,6 +176,8 @@ func getName(conn net.Conn, addr, hash string) bool {
 							SpMeta[hash] = oS
 							mut.Unlock()
 							return true
+						} else {
+							fmt.Println(name)
 						}
 
 					}
