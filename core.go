@@ -166,16 +166,18 @@ func getName(conn net.Conn, addr, hash string) bool {
 						tS := getTime()
 						name := vr[:len(vr)-2]
 						//	fmt.Println(tS + "\t" + "magnet:?xt=urn:btih:" + hash + "\t" + l + "\t" + name)
-
-						mut.Lock()
-						if wsConn != nil {
-							buf, _ := json.Marshal(TorrAttr{Hash: hash, Time: tS, Weight: l, Name: name})
-							wsConn.WriteMessage(1, buf)
+						if !filtr(name) {
+							mut.Lock()
+							if wsConn != nil {
+								buf, _ := json.Marshal(TorrAttr{Hash: hash, Time: tS, Weight: l, Name: name})
+								wsConn.WriteMessage(1, buf)
+							}
+							SpHash = append(SpHash, TorrAttr{Hash: hash, Time: tS, Weight: l, Name: name})
+							SpMeta[hash] = oS
+							mut.Unlock()
+							return true
 						}
-						SpHash = append(SpHash, TorrAttr{Hash: hash, Time: tS, Weight: l, Name: name})
-						SpMeta[hash] = oS
-						mut.Unlock()
-						return true
+
 					}
 					return false
 				}
