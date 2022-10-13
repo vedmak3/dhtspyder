@@ -38,25 +38,6 @@ var SpHash = []TorrAttr{}
 var SpMeta = make(map[string]string)
 var mut = &sync.RWMutex{}
 
-func reader(conn *websocket.Conn) {
-	for {
-		// read in a message
-		messageType, p, err := conn.ReadMessage()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		// print out that message for clarity
-		log.Println(string(p))
-
-		if err := conn.WriteMessage(messageType, p); err != nil {
-			log.Println(err)
-			return
-		}
-
-	}
-}
-
 func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	// upgrade this connection to a WebSocket
 	// connection
@@ -72,13 +53,10 @@ func main() {
 	mux.HandleFunc("/ws", wsEndpoint)
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl, _ := template.ParseFS(f, "index.html")
-		//	tmpl, _ := template.ParseFiles("index.html")
 		tmpl.Execute(w, SpHash)
 	})
 
-	mux.HandleFunc("/data.json", dataPage)
-
-	http.ListenAndServe(":80", mux)
+	http.ListenAndServe(":8000", mux)
 
 }
 
@@ -92,14 +70,6 @@ func mainCicle() {
 		}
 
 	}
-}
-
-func dataPage(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	w.Header().Add("Access-Control-Allow-Methods", "*")
-	buf, _ := json.Marshal(SpHash)
-	fmt.Fprint(w, string(buf))
 }
 
 func findNode(server string) []Noda {
@@ -165,7 +135,6 @@ func getName(conn net.Conn, addr, hash string) bool {
 						l := getLength(sp)
 						tS := getTime()
 						name := vr[:len(vr)-2]
-						//	fmt.Println(tS + "\t" + "magnet:?xt=urn:btih:" + hash + "\t" + l + "\t" + name)
 						if !filtr(name) {
 							mut.Lock()
 							if wsConn != nil {
@@ -173,7 +142,7 @@ func getName(conn net.Conn, addr, hash string) bool {
 								wsConn.WriteMessage(1, buf)
 							}
 							SpHash = append(SpHash, TorrAttr{Hash: hash, Time: tS, Weight: l, Name: name})
-							SpMeta[hash] = oS
+							SpMeta[hash] = ""
 							mut.Unlock()
 							return true
 						} else {
